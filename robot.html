@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>貼心機器人</title>
+    <style>
+        /* 基礎樣式重置 */
+        * { box-sizing: border-box; }
+        body, html { 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
+            background-color: #7494ad; /* 類似通訊軟體的背景色 */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        /* 手機容器佈局 */
+        #chat-window {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            background-color: #7494ad;
+            position: relative;
+        }
+
+        /* 頂部標題列 */
+        .header {
+            background-color: #353535;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 18px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* 訊息顯示區 */
+        #messages {
+            flex: 1;
+            padding: 20px 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* 對話氣泡 */
+        .msg {
+            max-width: 80%;
+            padding: 10px 14px;
+            border-radius: 18px;
+            font-size: 16px;
+            line-height: 1.4;
+            word-wrap: break-word;
+            position: relative;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .bot {
+            background-color: white;
+            color: black;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+
+        /* 下方按鈕區 */
+        .footer {
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        button {
+            background-color: #4e92df;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        /* 煙火畫布 */
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<div id="chat-window">
+    <div class="header">貼心機器人</div>
+    
+    <div id="messages">
+        </div>
+
+    <div class="footer" id="action-bar">
+        </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<script>
+    const msgContainer = document.getElementById('messages');
+    const actionBar = document.getElementById('action-bar');
+
+    // 新增訊息
+    function sendMsg(text) {
+        const div = document.createElement('div');
+        div.className = 'msg bot';
+        div.innerText = text;
+        msgContainer.appendChild(div);
+        msgContainer.scrollTop = msgContainer.scrollHeight;
+    }
+
+    // 初始狀態
+    function startSequence() {
+        msgContainer.innerHTML = '';
+        actionBar.innerHTML = '';
+        
+        setTimeout(() => {
+            sendMsg("你好，我是你的貼心機器人。");
+            setTimeout(() => {
+                sendMsg("這邊主人有準備一個小禮物，請您打開接收 🎁");
+                
+                // 顯示按鈕
+                const btn = document.createElement('button');
+                btn.innerText = "打開接收";
+                btn.onclick = receiveGift;
+                actionBar.appendChild(btn);
+            }, 1000);
+        }, 800);
+    }
+
+    // 接收禮物後的回覆
+    function receiveGift() {
+        actionBar.innerHTML = ''; // 隱藏按鈕
+        
+        setTimeout(() => {
+            sendMsg("你就是主人說的那個天天晚上 EMO 黑白亂哭的女生對不對？");
+            
+            setTimeout(() => {
+                sendMsg("現在給我笑！不要 EMO 不要哭！懂嗎？女人！😎");
+                
+                // 開始放煙火
+                triggerFireworks();
+            }, 1500);
+        }, 800);
+    }
+
+    // 煙火動畫 (持續5秒)
+    function triggerFireworks() {
+        const end = Date.now() + (5 * 1000);
+
+        (function frame() {
+            confetti({
+                particleCount: 3,
+                angle: 60,
+                spread: 55,
+                origin: { x: 0, y: 0.6 },
+                colors: ['#ff0000', '#ffd700', '#ff69b4', '#ffffff']
+            });
+            confetti({
+                particleCount: 3,
+                angle: 120,
+                spread: 55,
+                origin: { x: 1, y: 0.6 },
+                colors: ['#ff0000', '#ffd700', '#ff69b4', '#ffffff']
+            });
+
+            if (Date.now() < end) {
+                requestAnimationFrame(frame);
+            } else {
+                finishConversation();
+            }
+        }());
+    }
+
+    // 最後結尾
+    function finishConversation() {
+        setTimeout(() => {
+            sendMsg("煙火看完了，你可以睡覺了。💤");
+            
+            setTimeout(() => {
+                // 重新出現選項
+                const resetBtn = document.createElement('button');
+                resetBtn.innerText = "再看一次";
+                resetBtn.onclick = startSequence;
+                actionBar.appendChild(resetBtn);
+            }, 1000);
+        }, 500);
+    }
+
+    // 啟動
+    window.onload = startSequence;
+</script>
+
+</body>
+</html>
